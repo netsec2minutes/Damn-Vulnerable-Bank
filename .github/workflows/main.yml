@@ -1,11 +1,3 @@
-name: Mobsfscan Vulnerability Scanning
-
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-
 jobs:
   scan:
     runs-on: ubuntu-latest
@@ -18,13 +10,13 @@ jobs:
           args: --sarif -o mobsf.sarif
 
       - name: Upload mobsfscan results to GitHub Workflow artifacts
+        if: success() # This ensures the step runs only if the previous steps were successful.
         uses: actions/upload-artifact@v2
         with:
-          name: mobsf.sarif
+          name: mobsf-sarif
           path: mobsf.sarif
 
   import:
-    name: Conviso Findings Importation
     needs: scan
     runs-on: ubuntu-20.04
     container:
@@ -34,13 +26,10 @@ jobs:
         FLOW_API_KEY: ${{ secrets.CONVISO_API_KEY }}
         FLOW_API_URL: ${{ secrets.HOMOLOGA_URL }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Download mobsfscan result
         uses: actions/download-artifact@v2
         with:
-          name: mobsf.sarif
+          name: mobsf-sarif
 
       - name: SARIF Importation to Conviso
         run: |
