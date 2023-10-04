@@ -1,11 +1,3 @@
-name: Mobsfscan Vulnerability Scanning
-
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-
 jobs:
   scan:
     runs-on: ubuntu-latest
@@ -15,18 +7,18 @@ jobs:
       - name: Mobsfscan
         uses: MobSF/mobsfscan@0.3.4
         with:
-          args: --sarif -o mobsf.sarif
+          args: --sarif -o ${{ github.workspace }}/mobsf.sarif
 
-      - name: GitHub Workflow artifacts
+      - name: Upload to GitHub Security Dashboard
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ github.workspace }}/mobsf.sarif
+
+      - name: Upload as artifact
         uses: actions/upload-artifact@v2
         with:
           name: mobsf-sarif
-          path: mobsf.sarif
-
-      - name: GitHub Security Dashboard Alerts update
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: mobsf.sarif
+          path: ${{ github.workspace }}/mobsf.sarif
 
   import:
     needs: scan
