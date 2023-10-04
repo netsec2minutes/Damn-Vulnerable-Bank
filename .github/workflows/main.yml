@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+
 jobs:
   scan:
     runs-on: ubuntu-latest
@@ -16,12 +17,16 @@ jobs:
         with:
           args: --sarif -o mobsf.sarif
 
-      - name: Upload mobsfscan results to GitHub Workflow artifacts
-        if: success() # This ensures the step runs only if the previous steps were successful.
+      - name: GitHub Workflow artifacts
         uses: actions/upload-artifact@v2
         with:
           name: mobsf-sarif
           path: mobsf.sarif
+
+      - name: GitHub Security Dashboard Alerts update
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: mobsf.sarif
 
   import:
     needs: scan
