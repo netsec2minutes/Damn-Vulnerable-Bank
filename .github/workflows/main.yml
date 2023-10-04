@@ -1,0 +1,45 @@
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: mobsfscan
+      uses: MobSF/mobsfscan@0.3.4
+      with:
+        args: --sarif -o mobsf.sarif
+
+    - name: GitHub Security Dashboard Alerts update
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: mobsf.sarif
+
+    - name: Archive mobsfscan results
+      uses: actions/upload-artifact@v2
+      with:
+        name: mobsf.sarif
+        path: mobsf.sarif
+
+  import:
+    name: Conviso Findings Importation
+    needs: scan
+    runs-on: ubuntu-20.04
+    container:
+      image: convisoappsec/flowcli:unstable
+      env:
+        FLOW_PROJECT_CODE: ${{ secrets.PROJECT_CODE }}
+        FLOW_API_KEY: ${{ secrets.CONVISO_API_KEY }}
+        FLOW_API_URL: ${{ secrets.HOMOLOGA_URL }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download result from previous scan
+        uses: actions/download-artifact@v2
+        with:
+          name: mobsf.sarif
+
+      - name: SARIF Importation
+        run: |
+          conviso findings import-sarif --input-file mobsf.sarif
