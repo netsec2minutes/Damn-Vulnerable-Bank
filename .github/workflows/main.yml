@@ -1,4 +1,4 @@
-name: Vulnerability Scanning
+name: Mobsfscan Vulnerability Scanning
 
 on:
   push:
@@ -17,18 +17,7 @@ jobs:
         with:
           args: --sarif -o mobsf.sarif
 
-      - name: Nuclei - Vulnerability Scan
-        uses: projectdiscovery/nuclei-action@main
-        with:
-          target: http://testaspnet.vulnweb.com/
-
-      - name: GitHub Workflow artifacts (Nuclei)
-        uses: actions/upload-artifact@v2
-        with:
-          name: nuclei.log
-          path: nuclei.log
-
-      - name: Upload mobsfscan results
+      - name: Upload mobsfscan results to GitHub Workflow artifacts
         uses: actions/upload-artifact@v2
         with:
           name: mobsf.sarif
@@ -53,6 +42,6 @@ jobs:
         with:
           name: mobsf.sarif
 
-      - name: SARIF Importation
+      - name: SARIF Importation to Conviso
         run: |
           conviso findings import-sarif --input-file mobsf.sarif
