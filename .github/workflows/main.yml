@@ -1,4 +1,5 @@
-name: MOBSF
+name: Vulnerability Scanning
+
 on:
   push:
     branches: [master]
@@ -9,24 +10,29 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: mobsfscan
-      uses: MobSF/mobsfscan@0.3.4
-      with:
-        args: --sarif -o mobsf.sarif
+      - name: Mobsfscan
+        uses: MobSF/mobsfscan@0.3.4
+        with:
+          args: --sarif -o mobsf.sarif
 
-    - name: GitHub Security Dashboard Alerts update
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: mobsf.sarif
+      - name: Nuclei - Vulnerability Scan
+        uses: projectdiscovery/nuclei-action@main
+        with:
+          target: http://testaspnet.vulnweb.com/
 
-    - name: Archive mobsfscan results
-      uses: actions/upload-artifact@v2
-      with:
-        name: mobsf.sarif
-        path: mobsf.sarif
+      - name: GitHub Workflow artifacts (Nuclei)
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuclei.log
+          path: nuclei.log
+
+      - name: Upload mobsfscan results
+        uses: actions/upload-artifact@v2
+        with:
+          name: mobsf.sarif
+          path: mobsf.sarif
 
   import:
     name: Conviso Findings Importation
@@ -42,7 +48,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Download result from previous scan
+      - name: Download mobsfscan result
         uses: actions/download-artifact@v2
         with:
           name: mobsf.sarif
