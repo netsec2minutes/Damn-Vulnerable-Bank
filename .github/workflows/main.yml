@@ -15,18 +15,21 @@ jobs:
       - name: Mobsfscan
         uses: MobSF/mobsfscan@0.3.4
         with:
-          args: --sarif -o mobsf.sarif
+          args: --sarif -o ${{ github.workspace }}/mobsf.sarif
+
+      - name: List directory contents
+        run: ls -al ${GITHUB_WORKSPACE}
 
       - name: Upload to GitHub Security Dashboard
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: mobsf.sarif
+          sarif_file: ${{ github.workspace }}/mobsf.sarif
 
       - name: Upload mobsfscan results to GitHub Workflow artifacts
         uses: actions/upload-artifact@v2
         with:
           name: mobsf-sarif
-          path: mobsf.sarif
+          path: ${{ github.workspace }}/mobsf.sarif
 
   import:
     name: Conviso Findings Importation
