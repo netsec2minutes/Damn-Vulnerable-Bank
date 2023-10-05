@@ -11,11 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Mobsfscan
-        uses: MobSF/mobsfscan@0.3.4
-        with:
-          args: --sarif -o ${{ github.workspace }}/mobsf.sarif
+      
+      - name: Install Mobsfscan
+        run: |
+          pip install mobsfscan
+          echo "PATH=$(pwd)/.local/bin:$PATH" >> $GITHUB_ENV
+      
+      - name: Run Mobsfscan
+        run: mobsfscan . --sarif -o ${{ github.workspace }}/mobsf.sarif
 
       - name: List directory contents
         run: ls -al ${GITHUB_WORKSPACE}
@@ -51,5 +54,4 @@ jobs:
           name: mobsf-sarif
 
       - name: SARIF Importation to Conviso
-        run: |
-          conviso findings import-sarif --input-file mobsf.sarif
+        run: conviso findings import-sarif --input-file mobsf.sarif
