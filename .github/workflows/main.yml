@@ -25,9 +25,6 @@ jobs:
       - name: Run mobsfscan without output redirection
         run:  mobsfscan . --sarif -o /home/runner/work/Damn-Vulnerable-Bank/Damn-Vulnerable-Bank/mobsf.sarif || true
 
-      - name: Run mobsfscan with output redirection
-        run: mobsfscan . --sarif -o /home/runner/work/Damn-Vulnerable-Bank/Damn-Vulnerable-Bank/mobsf.sarif
-
       - name: List directory contents
         run: ls -al ${GITHUB_WORKSPACE}
 
