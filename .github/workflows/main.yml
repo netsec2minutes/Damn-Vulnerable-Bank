@@ -16,9 +16,17 @@ jobs:
         run: |
           pip install mobsfscan
           echo "PATH=$(pwd)/.local/bin:$PATH" >> $GITHUB_ENV
-      
-      - name: Run Mobsfscan
-        run: mobsfscan . --sarif -o ${{ github.workspace }}/mobsf.sarif
+
+      - name: Check mobsfscan installation
+        run: |
+          which mobsfscan
+          mobsfscan --version
+
+      - name: Run mobsfscan without output redirection
+        run: mobsfscan . --sarif
+
+      - name: Run mobsfscan with output redirection
+        run: mobsfscan . --sarif -o /home/runner/work/Damn-Vulnerable-Bank/Damn-Vulnerable-Bank/mobsf.sarif
 
       - name: List directory contents
         run: ls -al ${GITHUB_WORKSPACE}
@@ -26,13 +34,13 @@ jobs:
       - name: Upload to GitHub Security Dashboard
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ${{ github.workspace }}/mobsf.sarif
+          sarif_file: /home/runner/work/Damn-Vulnerable-Bank/Damn-Vulnerable-Bank/mobsf.sarif
 
       - name: Upload mobsfscan results to GitHub Workflow artifacts
         uses: actions/upload-artifact@v2
         with:
           name: mobsf-sarif
-          path: ${{ github.workspace }}/mobsf.sarif
+          path: /home/runner/work/Damn-Vulnerable-Bank/Damn-Vulnerable-Bank/mobsf.sarif
 
   import:
     name: Conviso Findings Importation
