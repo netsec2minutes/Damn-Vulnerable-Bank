@@ -23,7 +23,7 @@ jobs:
           mobsfscan --version
 
       - name: Run mobsfscan without output redirection
-        run: mobsfscan . --sarif
+        run:  mobsfscan . --sarif -o /home/runner/work/Damn-Vulnerable-Bank/Damn-Vulnerable-Bank/mobsf.sarif || true
 
       - name: Run mobsfscan with output redirection
         run: mobsfscan . --sarif -o /home/runner/work/Damn-Vulnerable-Bank/Damn-Vulnerable-Bank/mobsf.sarif
